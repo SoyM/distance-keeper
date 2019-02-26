@@ -223,9 +223,11 @@ def light_status():
         if virgin:
             virgin = False
             virgin_count = 0
-            while virgin_count<10:
+            while virgin_count<30:
                 read_serial()
                 virgin_count=virgin_count+1
+        
+            print("[\033[1;32;40mstart\033[0m]")
 
             if int(adc_right) < 70:
 
@@ -245,11 +247,15 @@ def light_status():
                     if tof_a != '':
                         if int(tof_a)<min_tof_a:
                             min_tof_a = int(tof_a)
-                        if  diff_yaw > math.pi*3/7:
-                            if int(tof_a) > min_tof_a + 3:
-                                break
+                        if  diff_yaw > math.pi*1/3:
+                            if int(tof_a) > min_tof_a + 4:
+                                read_serial()
+                                if int(tof_a) > min_tof_a + 4:
+                                    print("\033[0;32mfirst rotate end by [tof] \033[0m")
+                                    break
 
                     if diff_yaw > math.pi/2:
+                        print("\033[0;32mfirst rotate end [odom] \033[0m")
                         break
                     else:
                         pub_cmdvel.publish(move_cmd)
@@ -275,6 +281,7 @@ def light_status():
                 while True:
                     read_serial()
                     if int(tof_a)<110:
+                        print("\033[0;32mgo straight end [tof_a<110] \033[0m")
                         break
                     else:
                         pub_cmdvel.publish(move_cmd)
@@ -291,6 +298,7 @@ def light_status():
                     else:
                         yaw_diff = yaw-yaw_start
                     if yaw_diff < -math.pi/2:
+                        print("\033[0;32msencond rotate end [odom]\033[0m")
                         break
                     else:
                         pub_cmdvel.publish(move_cmd)
@@ -387,3 +395,4 @@ if __name__ == '__main__':
     p.start()
     p.join()
     print('Child process end.')
+
